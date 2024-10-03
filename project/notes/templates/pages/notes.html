@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<head>
+    <title>Notes</title>
+</head>
+<body>
+    <h2>Notes</h2>
+    <p>Logged in as {{ user.username }}</p>
+    <a href="{% url 'logout_user' %}">Logout</a>
+
+    <form method="get" action="{% url 'notes' %}">
+        <input type="text" name="search" placeholder="Search notes" value="{{ search_query }}">
+        <input type="submit" value="Search">
+    </form>
+
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="Add Note">
+    </form>
+
+    <ul>
+        {% for note in notes %}
+            <li>
+                {{ note.1 }}
+                <a href="{% url 'deleteNote' note.0 %}">Delete</a>
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
