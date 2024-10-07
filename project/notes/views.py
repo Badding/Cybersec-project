@@ -17,10 +17,9 @@ def loginView(request):
         if form.is_valid():
             username = request.POST.get('username')
             password = request.POST.get('password')
-            print(username, password)
-            user = User.objects.get(username=username)
-            print(user.check_password(password))
 
+            user = User.objects.get(username=username)
+            
             user = authenticate(request, username=username, password=password)
 
             if user:
@@ -37,20 +36,7 @@ def logout_user(request):
     return redirect('login')
 
 def registerView(request):
-    #this is a vulnerable way to handle user registration
-    """\
-    form = CreateUserForm() #part of the Django authentication system
 
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        password2 = request.POST.get('password2')
-
-        if password == password2:
-        """
-
-
-    #""" This is more secure way to handle user registration. Build in Django authentication system
     form = CreateUserForm()
 
     if request.method == 'POST':
@@ -61,19 +47,22 @@ def registerView(request):
             return redirect('login')
 
     return render(request, 'pages/register.html', {'form': form})
-    #"""
 
 def notesView(request):
 
     form = NoteForm()
+    search_query = request.GET.get('search', '')
 
-    """
-    fix for the SQL Injection
+    """ fix for the SQL Injection
+    
     also the notes.html template needs to be updated to display the notes correctly
+    note.1 = note.content
+    note.0 = note.id
+
+    # this is ORM query for user notes
     notes = Note.objects.filter(user=request.user)
     search_query = Note.objects.filter(content__contains=search_query, user=request.user)
     """
-    search_query = request.GET.get('search', '')
 
     with connection.cursor() as cursor:
         query = f"SELECT id,content FROM notes_note WHERE user_id = {request.user.id}"
@@ -84,12 +73,15 @@ def notesView(request):
     if search_query:
         with connection.cursor() as cursor:
             # for example if user searches for anything%' OR '1'='1' --
-            # the result is all notes from any user
+            # the result is all notes from the database
 
             query = f"SELECT id,content FROM notes_note WHERE content LIKE '%{search_query}%' AND user_id = {request.user.id}"
             cursor.execute(query)
             notes = cursor.fetchall()
-            
+        """ part of the fix for the SQL Injection
+        notes = search_query
+        """
+
     if request.method == 'POST':
         form = NoteForm(request.POST)
         
@@ -98,9 +90,7 @@ def notesView(request):
             note.user = request.user
             note.save()
 
-
             return redirect('notes')
-
 
     return render(request, 'pages/notes.html', {'form': form, 'notes': notes})
 
