@@ -3,7 +3,6 @@ from .forms import NoteForm, CreateUserForm, LoginForm
 from django.contrib.auth.models import auth
 from django.contrib.auth import authenticate, login, logout
 from .models import Note, User
-from django.db import connection
 
 # Create your views here.
 
@@ -46,24 +45,12 @@ def registerView(request):
 def notesView(request):
     form = NoteForm()
     search_query = request.GET.get('search', '')
-    
-    if search_query:    
-        with connection.cursor() as cursor:
-            """
-            UNSAFE SQL query,
-            for example if user searches for "anything%' OR '1'='1' --"
-            the result is all notes from the database
-            """
+    search_query = Note.objects.filter(content__contains=search_query, user=request.user)
 
-            query = f"SELECT id,content FROM notes_note WHERE content LIKE '%{search_query}%' AND user_id = {request.user.id}"
-            cursor.execute(query)
-            notes = cursor.fetchall()
-                
+    if search_query:
+        notes = search_query
     else:
-        with connection.cursor() as cursor:
-            query = f"SELECT id,content FROM notes_note WHERE user_id = {request.user.id}"
-            cursor.execute(query)
-            notes = cursor.fetchall()
+        notes = Note.objects.filter(user=request.user)
 
     if request.method == 'POST':
         form = NoteForm(request.POST)
@@ -78,10 +65,9 @@ def notesView(request):
     return render(request, 'pages/notes.html', {'form': form, 'notes': notes})
 
 def deleteNote(request, note_id):
-    
-    # there is a Broken Access Control flaw here, if the user is not the owner of the note, he can still delete it
     note = Note.objects.get(id=note_id)
-    note.delete()
+
+    if note.user == request.user:
+        note.delete()
 
     return redirect('notes')
-

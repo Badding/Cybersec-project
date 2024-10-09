@@ -17,7 +17,6 @@ class registerForm(forms.Form):
     password = forms.CharField(widget=forms.PasswordInput(), label='Password')
     password2 = forms.CharField(widget=forms.PasswordInput(), label='Repeat Password')
 
-#better
 class CreateUserForm(UserCreationForm):
     class Meta:
         model = User
