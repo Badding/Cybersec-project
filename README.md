@@ -1,4 +1,4 @@
-# Django Note Taking App for Cyber Security 2024 MOOC
+# Note Taking App for Cyber Security 2024 MOOC
 
 ## Introduction
 This is a simple note-taking application built with Django. It allows users to create, read, update, and delete notes.
@@ -8,6 +8,7 @@ The app is project for Cyber Security 2024 MOOC
 - User authentication
 - Create, read, update, and delete notes
 - Purposefully made security flaws for Syber security Course project
+- fixes for the security flaws in separate files
 
 ## Requirements
 - Python 3.x
@@ -17,7 +18,7 @@ The app is project for Cyber Security 2024 MOOC
 1. Clone the repository:
     ```bash
     git clone https://github.com/Badding/Cybersec-project.git
-    cd django-note-app
+    cd Cybersec-project/project
     ```
 
 2. Create a virtual environment and activate it:
@@ -47,6 +48,7 @@ The app is project for Cyber Security 2024 MOOC
     ```
 
 7. Open your browser and go to `http://127.0.0.1:8000`.
+8. Or Access Django admin panel from `http://127.0.0.1:8000/admin`
 
 ## Usage
 - Register or log in to start creating notes.
