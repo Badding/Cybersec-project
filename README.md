@@ -95,11 +95,11 @@ The solution for this issue is straightforward: always set `DEBUG` to `False` wh
 **Description:**  
 Identification and Authentication failures pose a security risk in web applications, particularly when weak password policies and insufficient account lockout systems are implemented. Without limitation on failed login attempts, the website becomes vulnerable to brute force attacks, allowing malicious users to try gaining unauthorized access.
 
-**Fix:**  
+**Fix:** 
+- [requirement.txt](project/requirement.txt) django-axes 7.0.0 added to the project
+- [settings.py Line 98](project/project/settings.py#L98) drango-axes settings in `settings.py`
+
 Django does not include built-in protection against these kinds of attacks. Therefore, to mitigate the security risks, Django Axes is integrated into this application. It is a third-party plugin that keeps track of login attempts and blocks brute-force attacks by locking the account after a specified number of unsuccessful attempts has been reached and disables the account temporarily. The plugin monitors suspicious login activities and logs relevant information to the Django administration panel, which is accessible to superusers. For this demonstration, it is configured to only track usernames and to ignore IP-address lockouts. The lockout time is set to only three minutes. Django Axes is quick and easy to set up and, when combined with a strong password policy, significantly reduces risks of identification and authentication failures, protecting user accounts from being compromised.
-
-Axes settings are in `settings.py`
-
 
 ### Flaw 5: A09:2021 Security Logging and Monitoring Failures
 **Source:** Missing feature
@@ -107,7 +107,8 @@ Axes settings are in `settings.py`
 **Description:**  
 Effective security logging and monitoring are crucial for detecting and responding to active breaches and for retaining alerts and forensic data for post-incident analysis. Without proper logging of important auditable events, such as user logins, failed login attempts, and warning messages, organizations may face big challenges in identifying vulnerabilities and responding to security incidents without having these systems in place.
 
-**Fix:**  
-To address this security risk, a basic logging system was implemented in the application before integrating Django Axes, resulting in some overlap between these two systems. In the `settings.py` file, lines 104-137 contain the configuration of Django’s logging framework, specifying log formatting, and setting up an `audit.log` file in the project root directory to save the logging and Django event data. The `signals.py` file sets up the handlers for user login, logout, and failed login events. Additionally, a helper function, `get_client_ip`, is used for extracting the user’s IP address from the request object. This simple logging system demonstrates the basic capabilities of logging events in a web application. However, in an actual production environment, it is important to incorporate an active mechanism for alerting admins to suspicious activity for quick incident response time.
+**Fix:**
+- [settings.py Line 104](project/project/settings.py#L104) line 104 added logging settings
+- [signals.py](project/notes/signals.py) Added handelers and to retrieve the IP address of the logging attempt.
 
-Fixes are in `settings.py` and `signals.py`
+To address this security risk, a basic logging system was implemented in the application before integrating Django Axes, resulting in some overlap between these two systems. In the `settings.py` file, lines 104-137 contain the configuration of Django’s logging framework, specifying log formatting, and setting up an `audit.log` file in the project root directory to save the logging and Django event data. The `signals.py` file sets up the handlers for user login, logout, and failed login events. Additionally, a helper function, `get_client_ip`, is used for extracting the user’s IP address from the request object. This simple logging system demonstrates the basic capabilities of logging events in a web application. However, in an actual production environment, it is important to incorporate an active mechanism for alerting admins to suspicious activity for quick incident response time.
